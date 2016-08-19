@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# allow user to install and run software without root privileges
+# and don't depend on a working system sources.list .. yuck
+#
+# you'll want to add ~/install/usr/bin/ to your $PATH (and maybe the bin,
+# sbin, usr/sbin, usr/games as well)
+# don't forget to also add ~/install/usr/lib to your $LD_LIBRARY_PATH
+#
+# gurkan@phys.ethz.ch
+#
+# /var/tmp is a place where everyone can write and the stuff stays after
+# a reboot. crontab using @reboot with some process in screen might be
+# useful
+
+ROOT=`echo $HOME`
+# you can also use sid repo as you wish...
+REPO=sarge
+ARCH=`dpkg-architecture -qDEB_HOST_ARCH`
+MIRROR=ftp://ftp.ch.debian.org/debian
+mkdir -p $ROOT/install/
+cd $ROOT/install/
+
+case $1 in
+    update)
+        if [ -f Packages.gz ]; then rm Packages.gz; fi
+        wget $MIRROR/dists/${REPO}/main/binary-${ARCH}/Packages.gz
+    ;;
+    install)
+	if [ -f Packages.gz ]; then
+    	    # wget `apt-get --print-uris install $2 |grep deb |sed "s,',,g" |awk '{print $1}'`
+	    URI=`zgrep "^Package\|^Filename" Packages.gz | awk '{p=$2;getline $0; print p " " $2}' |grep "^$2\ " | awk '{print $2}'`
+	    wget ${MIRROR}/${URI}
+	    dpkg -x $2*.deb .
+	else
+	    echo "Please run apt-get update first."
+	fi
+    ;;
+    *)
+        echo "Usage: $0 update"
+        echo "       $0 install zsh"
+        echo
+    ;;
+esac
