@@ -19,6 +19,7 @@
 # useful
 # SCREENDIR=/var/tmp/kdecache-user screen
 
+export LC_ALL=C
 ROOT=`echo $HOME`
 # you can also use sid repo as you wish...
 REPO=jessie
