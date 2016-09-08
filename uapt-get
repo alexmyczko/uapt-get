@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# written around 2005 (sarge)
+#
+# possible improvements dont depend on dpkg-architecture, uname -m says i*86 which should be i386, and x86_64 should be amd64
+# and dont depend on dpkg (ar) for non-debian systems
+#
 # allow user to install and run software without root privileges
 # and don't depend on a working system sources.list .. yuck
 #
@@ -7,38 +12,102 @@
 # sbin, usr/sbin, usr/games as well)
 # don't forget to also add ~/install/usr/lib to your $LD_LIBRARY_PATH
 #
-# gurkan@phys.ethz.ch
+# gurkan@aiei.ch
 #
 # /var/tmp is a place where everyone can write and the stuff stays after
 # a reboot. crontab using @reboot with some process in screen might be
 # useful
+# SCREENDIR=/var/tmp/kdecache-user screen
 
 ROOT=`echo $HOME`
 # you can also use sid repo as you wish...
-REPO=sarge
+REPO=jessie
+REPO=sid
 ARCH=`dpkg-architecture -qDEB_HOST_ARCH`
 MIRROR=ftp://ftp.ch.debian.org/debian
 mkdir -p $ROOT/install/
 cd $ROOT/install/
 
+ENOPACKAGES="-e Please run apt-get update first.\n"
+
 case $1 in
     update)
         if [ -f Packages.gz ]; then rm Packages.gz; fi
         wget $MIRROR/dists/${REPO}/main/binary-${ARCH}/Packages.gz
+        if [ -f Sources.gz ]; then rm Sources.gz; fi
+        wget $MIRROR/dists/${REPO}/main/source/Sources.gz
     ;;
     install)
-	if [ -f Packages.gz ]; then
-    	    # wget `apt-get --print-uris install $2 |grep deb |sed "s,',,g" |awk '{print $1}'`
-	    URI=`zgrep "^Package\|^Filename" Packages.gz | awk '{p=$2;getline $0; print p " " $2}' |grep "^$2\ " | awk '{print $2}'`
-	    wget ${MIRROR}/${URI}
-	    dpkg -x $2*.deb .
+	# check if the package is availble
+	# resolve dependencies
+        if [ -f Packages.gz ]; then
+            # wget `apt-get --print-uris install $2 |grep deb |sed "s,',,g" |awk '{print $1}'`
+            URI=`zgrep "^Package\|^Filename" Packages.gz | awk '{p=$2;getline $0; print p " " $2}' |grep "^$2\ " | awk '{print $2}'`
+	    if [ ! -f `basename $URI` ]; then
+        	wget ${MIRROR}/${URI}
+	    fi
+            dpkg -x $2*.deb .
+        else
+            echo -e $ENOPACKAGES
+        fi
+    ;;
+    search)
+        if [ -f Packages.gz ]; then
+            zgrep "^Package\|^Description" Packages.gz | awk '{p=$2;getline $0;$1=""; print p " - " $0}'| grep "$2"
+        else
+            echo -e $ENOPACKAGES
+        fi
+    ;;
+    show)
+        if [ -f Packages.gz ]; then
+            zcat Packages.gz | awk -v p="Package: $2" 'BEGIN{RS=""; FS="\n"}{if ($0 ~ p) {print $0;print " "}}'
+        else
+            echo -e $ENOPACKAGES
+        fi
+    ;;
+    pkgnames)
+        if [ -f Packages.gz ]; then
+            zcat Packages.gz | grep "^Package:" | awk '{print $2}'
+        else
+            echo -e $ENOPACKAGES
+        fi
+    ;;
+    upgrade)
+	# check if there are debs at all
+	for a in `ls *.deb | sed "s,_.*,,"`; do
+	    $0 install $a
+	done
+    ;;
+    clean)
+	rm *.deb
+    ;;
+    source)
+        if [ -f Sources.gz ]; then
+	    echo -e "Trying to get the source...\n"
+            zcat Sources.gz | awk -v p="Package: $2\n" 'BEGIN{RS=""; FS="\n"}{if ($0 ~ p) print $0}' | grep "^ \|^Directory" #| awk '{print $NF}'
+	    #echo $URI
+	    #if [ ! -f `basename $URI` ]; then
+        #	echo wget ${MIRROR}/${URI}
+	    #fi
+            echo dpkg-source -x $2*.dsc
 	else
-	    echo "Please run apt-get update first."
+	    echo -e $ENOPACKAGES
 	fi
     ;;
     *)
-        echo "Usage: $0 update"
-        echo "       $0 install zsh"
+	c=`basename $0`
+        echo "Usage: $c update"
+        echo "       $c search zsh"
+        echo "       $c show zsh"
+        echo "       $c pkgnames"
+        echo "       $c install zsh"
+        echo "       $c source zsh"
+        echo "       $c upgrade"
+        echo "       $c clean"
         echo
+	echo 'PATH=$PATH:~/install/usr/bin:~/install/bin:~/install/usr/games:~/install/usr/sbin:~/install/sbin'
+	echo 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/install/usr/lib'
+	echo 'MANPATH=$MANPATH:~/install/usr/share/man'
+	echo
     ;;
 esac
