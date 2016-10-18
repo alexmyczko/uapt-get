@@ -3,7 +3,8 @@
 # written around 2005 (sarge)
 #
 # and dont depend on dpkg (ar) for non-debian systems
-# ar x the.deb `ar t the.deb | grep data` will get you the data.tar.*
+# ar x the.deb `ar t the.deb | grep data` will get you the data.tar.*, then tar xf the data.tar.* and move the stuff to
+# the right place. remove data.tar.*
 #
 # allow user to install and run software without root privileges
 # and don't depend on a working system sources.list .. yuck
