@@ -24,7 +24,15 @@ ROOT=`echo $HOME`
 # you can also use sid repo as you wish...
 REPO=jessie
 REPO=sid
-ARCH=`dpkg-architecture -qDEB_HOST_ARCH`
+#ARCH=`dpkg-architecture -qDEB_HOST_ARCH`
+case `uname -m` in
+    x86_64)
+        ARCH=amd64
+    ;;
+    i*86)
+        ARCH=i386
+    ;;
+esac
 MIRROR=ftp://ftp.ch.debian.org/debian
 mkdir -p $ROOT/install/
 cd $ROOT/install/
