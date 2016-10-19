@@ -52,9 +52,9 @@ ENOPACKAGES="-e Please run apt-get update first.\n"
 case $1 in
     update)
         if [ -f Packages.gz ]; then rm Packages.gz; fi
-        wget $MIRROR/dists/${REPO}/main/binary-${ARCH}/Packages.gz
+        wget -nv $MIRROR/dists/${REPO}/main/binary-${ARCH}/Packages.gz
         if [ -f Sources.gz ]; then rm Sources.gz; fi
-        wget $MIRROR/dists/${REPO}/main/source/Sources.gz
+        wget -nv $MIRROR/dists/${REPO}/main/source/Sources.gz
     ;;
     install)
 	# check if the package is availble
@@ -63,7 +63,7 @@ case $1 in
             # wget `apt-get --print-uris install $2 |grep deb |sed "s,',,g" |awk '{print $1}'`
             URI=`zgrep "^Package\|^Filename" Packages.gz | awk '{p=$2;getline $0; print p " " $2}' |grep "^$2\ " | awk '{print $2}'`
 	    if [ ! -f `basename $URI` ]; then
-        	wget ${MIRROR}/${URI}
+        	wget -nv ${MIRROR}/${URI}
 	    fi
             dpkg -x $2*.deb .
         else
