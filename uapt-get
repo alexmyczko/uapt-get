@@ -20,6 +20,15 @@
 # useful
 # SCREENDIR=/var/tmp/kdecache-user screen
 
+# check if called binaries are available
+for a in uname mkdir wget awk grep zcat zgrep rm ar; do
+    which $a >/dev/null
+    if [ ! $? -eq 0 ]; then
+        echo $a not found
+        exit 1
+    fi
+done
+
 export LC_ALL=C
 ROOT=`echo $HOME`
 # you can also use sid repo as you wish...
