@@ -65,7 +65,9 @@ case $1 in
 	    if [ ! -f `basename $URI` ]; then
         	wget -nv ${MIRROR}/${URI}
 	    fi
-            dpkg -x $2*.deb .
+            #dpkg -x $2*.deb .
+	    ar x $2*.deb `ar t $2*.deb | grep data`
+            tar xvf data.tar.*
         else
             echo -e $ENOPACKAGES
         fi
