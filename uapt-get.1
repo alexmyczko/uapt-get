@@ -1,1 +1,32 @@
-
+.TH uapt-get "1" "July 2017" "Usage: uapt-get update" "User Commands"
+.SH NAME
+uapt-get - User mode apt-get
+.SH SYNOPSIS
+.nf
+\fBuapt-get\fR [\fIupdate\fR]
+\fBuapt-get\fR [\fIsearch\fR] [\fIpkg\fR]
+\fBuapt-get\fR [\fIshow\fR] [\fIpkg\fR]
+\fBuapt-get\fR [\fIpkgnames\fR]
+\fBuapt-get\fR [\fIinstall\fR] [\fIpkg\fR]
+\fBuapt-get\fR [\fIsource\fR] [\fIpkg\fR]
+\fBuapt-get\fR [\fIupgrade\fR]
+\fBuapt-get\fR [\fIclean\fR]
+.fi
+.SH DESCRIPTION
+If you are stuck on a machine without dpkg/apt-get, and need some packages quick,
+and you do not have root access. Or if you are stuck on a Debian or Ubuntu machine
+without root access, uapt-get is here for the rescue.
+.SH CONFIGURATION
+You will want to configure your shell for PATH, LD_LIBRARY_PATH, and MANPATH
+.sp
+PATH=$PATH:~/install/usr/bin:~/install/bin:~/install/usr/games:~/install/usr/sbin:~/install/sbin
+.sp
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/install/usr/lib
+.sp
+MANPATH=$MANPATH:~/install/usr/share/man
+.SH "SEE ALSO"
+.BR apt-get (8).
+.SH "AUTHORS"
+uapt-get was written by Alex Myczko <alex@aiei.ch>
+.SH "WEB"
+https://github.com/alexmyczko/uapt-get
