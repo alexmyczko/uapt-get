@@ -9,7 +9,7 @@ sbin, usr/sbin, usr/games as well).
 Don't forget to also add ~/install/usr/lib to your `$LD_LIBRARY_PATH`,
 maybe also set `$MANPATH`.
 
-gurkan@phys.ethz.ch
+alex@aiei.ch
 
 `/var/tmp` is a place where everyone can write and the stuff stays after
 a reboot. crontab using @reboot with some process in `screen` might be
